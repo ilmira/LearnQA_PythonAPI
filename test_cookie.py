@@ -7,5 +7,5 @@ class TestCookie:
         print(f'\nText is: {response.cookies}')
 
         assert response.cookies
-        assert response.cookies.get('HomeWork')
+        assert 'HomeWork' in response.cookies
         assert response.cookies.get('HomeWork') == 'hw_value'
