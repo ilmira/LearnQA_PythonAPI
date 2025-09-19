@@ -4,6 +4,7 @@ from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
 
+
 class TestUserEdit(BaseCase):
     def setup_method(self):
         # REGISTER
@@ -17,13 +18,9 @@ class TestUserEdit(BaseCase):
         self.first_name = register_data['firstName']
         self.password = register_data['password']
         self.user_id = self.get_json_value(response1, 'id')
+        print(self.user_id)
 
-    def teardown_method(self):
-        MyRequests.delete(f'/user/{self.user_id}')
-
-    def test_edit_just_created_user(self):
-        # LOGIN
-
+    def login_current_user(self):
         login_data = {
             'email': self.email,
             'password': self.password
@@ -31,8 +28,18 @@ class TestUserEdit(BaseCase):
 
         response2 = MyRequests.post('/user/login', data=login_data)
 
-        auth_sid = self.get_cookie(response2, 'auth_sid')
-        token = self.get_header(response2, 'x-csrf-token')
+        self.auth_sid = self.get_cookie(response2, 'auth_sid')
+        self.token = self.get_header(response2, 'x-csrf-token')
+
+    def teardown_method(self):
+        self.login_current_user()
+        MyRequests.delete(f'/user/{self.user_id}', headers={'x-csrf-token': self.token},
+                          cookies={'auth_sid': self.auth_sid})
+
+    def test_edit_just_created_user(self):
+        # LOGIN
+
+        self.login_current_user()
 
         # EDIT
 
@@ -40,8 +47,8 @@ class TestUserEdit(BaseCase):
 
         response3 = MyRequests.put(
             f'/user/{self.user_id}',
-            headers={'x-csrf-token': token},
-            cookies={'auth_sid': auth_sid},
+            headers={'x-csrf-token': self.token},
+            cookies={'auth_sid': self.auth_sid},
             data={'firstName': new_name}
         )
 
@@ -51,8 +58,8 @@ class TestUserEdit(BaseCase):
 
         response4 = MyRequests.get(
             f'/user/{self.user_id}',
-            headers={'x-csrf-token': token},
-            cookies={'auth_sid': auth_sid},
+            headers={'x-csrf-token': self.token},
+            cookies={'auth_sid': self.auth_sid},
         )
 
         Assertions.assert_json_value_by_name(
@@ -73,7 +80,6 @@ class TestUserEdit(BaseCase):
         )
 
         Assertions.assert_code_status(response3, 400)
-
 
     def test_edit_just_created_user_another_user_auth(self):
         # LOGIN
@@ -101,19 +107,10 @@ class TestUserEdit(BaseCase):
 
         Assertions.assert_code_status(response3, 400)
 
-
     def test_edit_just_created_user_to_wrong_email(self):
         # LOGIN
 
-        login_data = {
-            'email': self.email,
-            'password': self.password
-        }
-
-        response2 = MyRequests.post('/user/login', data=login_data)
-
-        auth_sid = self.get_cookie(response2, 'auth_sid')
-        token = self.get_header(response2, 'x-csrf-token')
+        self.login_current_user()
 
         # EDIT
 
@@ -121,8 +118,8 @@ class TestUserEdit(BaseCase):
 
         response3 = MyRequests.put(
             f'/user/{self.user_id}',
-            headers={'x-csrf-token': token},
-            cookies={'auth_sid': auth_sid},
+            headers={'x-csrf-token': self.token},
+            cookies={'auth_sid': self.auth_sid},
             data={'email': new_email}
         )
 
@@ -132,15 +129,7 @@ class TestUserEdit(BaseCase):
     def test_edit_just_created_user_to_short_name(self):
         # LOGIN
 
-        login_data = {
-            'email': self.email,
-            'password': self.password
-        }
-
-        response2 = MyRequests.post('/user/login', data=login_data)
-
-        auth_sid = self.get_cookie(response2, 'auth_sid')
-        token = self.get_header(response2, 'x-csrf-token')
+        self.login_current_user()
 
         # EDIT
 
@@ -148,8 +137,8 @@ class TestUserEdit(BaseCase):
 
         response3 = MyRequests.put(
             f'/user/{self.user_id}',
-            headers={'x-csrf-token': token},
-            cookies={'auth_sid': auth_sid},
+            headers={'x-csrf-token': self.token},
+            cookies={'auth_sid': self.auth_sid},
             data={'firstName': new_name}
         )
 
