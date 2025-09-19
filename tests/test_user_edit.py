@@ -18,7 +18,6 @@ class TestUserEdit(BaseCase):
         self.first_name = register_data['firstName']
         self.password = register_data['password']
         self.user_id = self.get_json_value(response1, 'id')
-        print(self.user_id)
 
     def login_current_user(self):
         login_data = {
