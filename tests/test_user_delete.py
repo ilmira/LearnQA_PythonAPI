@@ -1,5 +1,3 @@
-import pytest
-
 from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
@@ -67,7 +65,6 @@ class TestUserDelete(BaseCase):
         )
 
         Assertions.assert_code_status(response4, 404)
-
 
     def test_delete_user_just_created_no_auth(self):
         # REGISTER
