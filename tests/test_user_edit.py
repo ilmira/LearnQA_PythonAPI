@@ -5,6 +5,7 @@ from lib.base_case import BaseCase
 from lib.assertions import Assertions
 
 
+@allure.epic('Edit user cases')
 class TestUserEdit(BaseCase):
     def setup_method(self):
         # REGISTER

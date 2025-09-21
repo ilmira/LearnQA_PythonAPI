@@ -1,10 +1,10 @@
 import pytest
-
+import allure
 from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
 
-
+@allure.epic('Registration cases')
 class TestUserRegister(BaseCase):
 
     def test_create_user_successfully(self):
